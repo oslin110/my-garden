@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的個人空間 - 小花園與心靈小廚房</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #e8f5e9;
+            --accent: #d84315;
+            --accent-light: #fbe9e7;
+            --bg: #f4f6f4;
+            --card-bg: #ffffff;
+            --text: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* ========== 第一層：大選項選單 (Main Nav) ========== */
+        .main-nav {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            background: #ffffff;
+            padding: 8px 16px;
+            border-radius: 35px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .main-tab-btn {
+            background: transparent;
+            color: #666;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .main-tab-btn.active-garden {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .main-tab-btn.active-kitchen {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        /* 專區容器控制 */
+        .section-content {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        /* ========== 第二層：子切換選單 (Sub Menu) ========== */
+        .sub-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .menu-btn {
+            background: #ffffff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-btn.active, .menu-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        /* 廚房專用子選單按鈕 */
+        .menu-btn.kitchen {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .menu-btn.kitchen.active, .menu-btn.kitchen:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        /* 卡片通用樣式 */
+        .item-card {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .item-card.active {
+            display: block;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            color: var(--primary);
+            margin: 0 0 4px 0;
+        }
+
+        .card-header.kitchen h2 {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            color: #666;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        /* 1:1 照片區域 */
+        .image-gallery {
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .image-container img.active {
+            opacity: 1;
+        }
+
+        .image-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .nav-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        /* 表格樣式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f9fbf9;
+            color: var(--primary);
+            width: 28%;
+            vertical-align: top;
+        }
+
+        th.kitchen-th {
+            background: #fff8f6;
+            color: var(--accent);
+        }
+
+        ol, ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 第一層：兩個大選項切換 -->
+<div class="main-nav">
+    <button id="tab-garden" class="main-tab-btn active-garden" onclick="switchMainTab('section-garden', this, 'active-garden')">🌿 我的小花園圖鑑</button>
+    <button id="tab-kitchen" class="main-tab-btn" onclick="switchMainTab('section-kitchen', this, 'active-kitchen')">🍲 心靈小廚房</button>
+</div>
+
+<!-- ====================================
+     大選項一：我的小花園圖鑑專區
+==================================== -->
+<div id="section-garden" class="section-content active">
+
+    <!-- 第二層：植物切換選單 -->
+    <div class="sub-menu">
+        <button class="menu-btn active" onclick="switchItem('section-garden', 'plant-1', this)">🍒 西印度櫻桃</button>
+        <button class="menu-btn" onclick="switchItem('section-garden', 'plant-2', this)">🪴 捕蠅草</button>
+        <button class="menu-btn" onclick="switchItem('section-garden', 'plant-3', this)">🌵 火龍果</button>
+    </div>
+
+    <!-- 植物一：西印度櫻桃 -->
+    <div id="plant-1" class="item-card active">
+        <div class="card-header">
+            <h2>西印度櫻桃</h2>
+            <div class="subtitle">Malpighia glabra / Malpighia emarginata</div>
+        </div>
+        <div class="image-gallery">
+            <div class="image-container">
+                <img class="active" src="fruit.jpg" alt="果實">
+                <img src="flower.jpg" alt="花朵">
+                <img src="all.jpg" alt="全株">
+            </div>
+            <div class="image-nav">
+                <button class="nav-btn active" onmouseover="showImg('plant-1', 0)" onclick="showImg('plant-1', 0)">🍒 果實</button>
+                <button class="nav-btn" onmouseover="showImg('plant-1', 1)" onclick="showImg('plant-1', 1)">🌸 花朵</button>
+                <button class="nav-btn" onmouseover="showImg('plant-1', 2)" onclick="showImg('plant-1', 2)">🌿 全株</button>
+            </div>
+        </div>
+        <table>
+            <tr><th>別名</th><td>黃槴櫻、巴貝多櫻桃</td></tr>
+            <tr><th>科屬</th><td>黃槴花科金虎尾屬</td></tr>
+            <tr>
+                <th>特徵</th>
+                <td>
+                    <ul>
+                        <li><strong>果實</strong>：熟時鮮紅色，表面微分脊。</li>
+                        <li><strong>花朵</strong>：花瓣帶褶皺，粉紅至淡粉色。</li>
+                        <li><strong>葉片</strong>：對生革質葉，光滑亮綠。</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr><th>特色</th><td>維生素 C 含量極高，可生食或做果汁。</td></tr>
+        </table>
+    </div>
+
+    <!-- 植物二：捕蠅草 -->
+    <div id="plant-2" class="item-card">
+        <div class="card-header">
+            <h2>捕蠅草</h2>
+            <div class="subtitle">Dionaea muscipula</div>
+        </div>
+        <div class="image-gallery">
+            <div class="image-container">
+                <img class="active" src="肉1.jpg" alt="夾子">
+                <img src="肉2.jpg" alt="全株">
+                <img src="肉3.jpg" alt="花朵">
+            </div>
+            <div class="image-nav">
+                <button class="nav-btn active" onmouseover="showImg('plant-2', 0)" onclick="showImg('plant-2', 0)">🦟 夾子</button>
+                <button class="nav-btn" onmouseover="showImg('plant-2', 1)" onclick="showImg('plant-2', 1)">🌿 全株</button>
+                <button class="nav-btn" onmouseover="showImg('plant-2', 2)" onclick="showImg('plant-2', 2)">🌸 花朵</button>
+            </div>
+        </div>
+        <table>
+            <tr><th>別名</th><td>維納斯的捕蠅草、蠅鋏草</td></tr>
+            <tr><th>科屬</th><td>茅膏菜科捕蠅草屬</td></tr>
+            <tr>
+                <th>特徵</th>
+                <td>
+                    <ul>
+                        <li><strong>捕蟲夾</strong>：葉片特化成夾合狀，邊緣有刺毛。</li>
+                        <li><strong>感應毛</strong>：觸碰兩次會快速閉合捕食。</li>
+                        <li><strong>株型</strong>：蓮座狀平鋪生長。</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr><th>特色</th><td>原生於貧瘠沼澤，具備快速感應捕食運動。</td></tr>
+        </table>
+    </div>
+
+    <!-- 植物三：火龍果 -->
+    <div id="plant-3" class="item-card">
+        <div class="card-header">
+            <h2>火龍果</h2>
+            <div class="subtitle">Selenicereus undatus</div>
+        </div>
+        <div class="image-gallery">
+            <div class="image-container">
+                <img class="active" src="火1.jpg" alt="成熟果實">
+                <img src="火2.jpg" alt="肉質莖與花苞">
+                <img src="火3.jpg" alt="植株全貌">
+            </div>
+            <div class="image-nav">
+                <button class="nav-btn active" onmouseover="showImg('plant-3', 0)" onclick="showImg('plant-3', 0)">🐉 熟果特寫</button>
+                <button class="nav-btn" onmouseover="showImg('plant-3', 1)" onclick="showImg('plant-3', 1)">🌱 莖與花苞</button>
+                <button class="nav-btn" onmouseover="showImg('plant-3', 2)" onclick="showImg('plant-3', 2)">🌿 植株全貌</button>
+            </div>
+        </div>
+        <table>
+            <tr><th>別名</th><td>紅龍果、量天尺、仙蜜果</td></tr>
+            <tr><th>科屬</th><td>仙人掌科量天尺屬</td></tr>
+            <tr>
+                <th>特徵</th>
+                <td>
+                    <ul>
+                        <li><strong>莖幹</strong>：三稜肉質長莖，邊緣微刺，具攀緣性。</li>
+                        <li><strong>花苞/花朵</strong>：夜間開放巨大白花，香氣濃郁。</li>
+                        <li><strong>果實</strong>：外皮朱紅帶綠鱗片，果肉富含黑籽。</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr><th>特色</th><td>喜全日照耐旱，富含水溶性膳食纖維與甜菜紅素。</td></tr>
+        </table>
+    </div>
+
+</div>
+
+<!-- ====================================
+     大選項二：心靈小廚房專區
+==================================== -->
+<div id="section-kitchen" class="section-content">
+
+    <!-- 第二層：料理切換選單 -->
+    <div class="sub-menu">
+        <button class="menu-btn kitchen active" onclick="switchItem('section-kitchen', 'recipe-1', this)">🍹 西印度櫻桃特調</button>
+        <button class="menu-btn kitchen" onclick="switchItem('section-kitchen', 'recipe-2', this)">🥗 火龍果百匯沙拉</button>
+    </div>
+
+    <!-- 料理一：西印度櫻桃特調 -->
+    <div id="recipe-1" class="item-card active">
+        <div class="card-header kitchen">
+            <h2>西印度櫻桃特調</h2>
+            <div class="subtitle">Acerola Sparkler Recipe</div>
+        </div>
+        <div class="image-gallery">
+            <div class="image-container">
+                <img class="active" src="櫻桃水.jpg" alt="西印度櫻桃特調">
+            </div>
+        </div>
+        <table>
+            <tr>
+                <th class="kitchen-th">食材配方</th>
+                <td>
+                    <ul>
+                        <li><strong>新鮮西印度櫻桃</strong>：6 ~ 8 顆（洗淨去籽）</li>
+                        <li><strong>天然蜂蜜/有機糖漿</strong>：1 ~ 2 茶匙</li>
+                        <li><strong>無糖氣泡水</strong>：200 ml</li>
+                        <li><strong>冰塊與薄荷葉</strong>：適量</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th class="kitchen-th">製作步驟</th>
+                <td>
+                    <ol>
+                        <li><strong>壓汁萃取</strong>：將新鮮採收的西印度櫻桃去籽，放入杯中用壓汁棒輕壓出酸甜果汁。</li>
+                        <li><strong>融合甜味</strong>：加入 1~2 茶匙蜂蜜，與濃郁果汁均勻攪拌融合。</li>
+                        <li><strong>注入氣泡</strong>：加入適量冰塊後，緩緩倒入氣泡水。</li>
+                        <li><strong>點綴完成</strong>：插入吸管，上方擺上一朵新鮮薄荷葉點綴即可飲用！</li>
+                    </ol>
+                </td>
+            </tr>
+            <tr>
+                <th class="kitchen-th">心靈療癒</th>
+                <td>滿滿天然維生素 C 帶來的微酸甘甜，氣泡綿密的口感能瞬間紓解壓力與疲勞，為午後帶來煥然一新的愉悅心情。</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 料理二：火龍果優格百匯沙拉 -->
+    <div id="recipe-2" class="item-card">
+        <div class="card-header kitchen">
+            <h2>火龍果優格百匯沙拉</h2>
+            <div class="subtitle">Dragon Fruit Yogurt Bowl</div>
+        </div>
+        <div class="image-gallery">
+            <div class="image-container">
+                <img class="active" src="火龍果沙拉.jpg" alt="火龍果優格百匯沙拉">
+            </div>
+        </div>
+        <table>
+            <tr>
+                <th class="kitchen-th">食材配方</th>
+                <td>
+                    <ul>
+                        <li><strong>自產火龍果</strong>：半顆（去皮，切塊或切片）</li>
+                        <li><strong>原味/無糖希臘優格</strong>：150g ~ 200g</li>
+                        <li><strong>綜合堅果與燕麥脆片</strong>：適量</li>
+                        <li><strong>新鮮薄荷葉或蜂蜜</strong>：少許</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th class="kitchen-th">製作步驟</th>
+                <td>
+                    <ol>
+                        <li><strong>鋪設基底</strong>：在沙拉碗底部鋪上一層濃郁的無糖優格。</li>
+                        <li><strong>擺放水果</strong>：將去皮切好的紅肉/白肉火龍果塊整齊排列於優格上方。</li>
+                        <li><strong>增添口感</strong>：撒上綜合堅果與燕麥脆片，增加豐富的層次。</li>
+                        <li><strong>點綴完成</strong>：擺上新鮮薄荷葉，可依喜好淋上薄薄一層天然蜂蜜即可享用！</li>
+                    </ol>
+                </td>
+            </tr>
+            <tr>
+                <th class="kitchen-th">心靈療癒</th>
+                <td>絢麗的色彩視覺饗宴，搭配高纖與優格，給腸胃與心靈最輕盈無負擔的溫柔滋養。</td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    // 切換第一層大選項（花園 / 廚房）
+    function switchMainTab(sectionId, btn, activeClass) {
+        document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.main-tab-btn').forEach(b => {
+            b.classList.remove('active-garden');
+            b.classList.remove('active-kitchen');
+        });
+
+        document.getElementById(sectionId).classList.add('active');
+        btn.classList.add(activeClass);
+    }
+
+    // 切換第二層項目（植物或食譜卡片）
+    function switchItem(sectionId, itemId, btn) {
+        const section = document.getElementById(sectionId);
+        section.querySelectorAll('.item-card').forEach(c => c.classList.remove('active'));
+        section.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(itemId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // 切換相簿照片
+    function showImg(cardId, index) {
+        const card = document.getElementById(cardId);
+        const imgs = card.querySelectorAll('.image-container img');
+        const btns = card.querySelectorAll('.nav-btn');
+        imgs.forEach((img, i) => img.classList.toggle('active', i === index));
+        btns.forEach((btn, i) => btn.classList.toggle('active', i === index));
+    }
+</script>
+
+</body>
+</html>
